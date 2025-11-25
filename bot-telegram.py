@@ -1,5 +1,8 @@
+from dotenv import load_dotenv
 import logging
 import sqlite3
+import os
+import sys
 import hashlib
 import re
 import unicodedata
@@ -32,9 +35,15 @@ logging.basicConfig(
     handlers=[logging.FileHandler('bot.log'), logging.StreamHandler()]
 )
 
-TOKEN = "8300067091:AAHO76WRtOQ41Hw8iQNqhmZ2rFoqm0wyILE"
-DB_NAME = "comprobantes.db"
-TIMEZONE = pytz.timezone('America/Havana')
+load_dotenv()
+
+TOKEN = os.getenv('TOKEN')
+DB_NAME = os.getenv('DB_NAME', 'comprobantes.db')
+TIMEZONE = pytz.timezone(os.getenv('TIMEZONE', 'America/Havana'))
+
+if not TOKEN:
+    logging.error('Telegram bot token (TOKEN) not set in environment. Please add it to your .env file.')
+    sys.exit(1)
 
 # ------------------------- LISTA DE ENTIDADES (BANCOS Y EMISORES) -------------------------
 BANCOS = {
