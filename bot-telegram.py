@@ -1,4 +1,5 @@
 from dotenv import load_dotenv
+import os as _os
 import logging
 import sqlite3
 import os
@@ -159,7 +160,11 @@ def calcular_hashes(file_data):
         logging.error(f"Error calculando hashes: {str(e)}")
         return {'phash': '', 'content_hash': ''}
 
-OCR_READER = easyocr.Reader(['es'], gpu=False, quantize=True)
+# Always use CPU for VPS/no-GPU environments
+# Force CPU-only for easyocr (VPS compatibility)
+if _os.environ.get('EASYOCR_FORCE_GPU', '').lower() in {'1', 'true', 'yes'}:
+    logging.warning('GPU usage for easyocr is disabled on this deployment. Forcing CPU (gpu=False).')
+OCR_READER = easyocr.Reader(['es'], gpu=False, quantize=True)  # Always use CPU for VPS/no-GPU environments
 
 def extraer_texto(file_data):
     try:
